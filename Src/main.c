@@ -124,9 +124,9 @@ int main(void)
     
         /* USER CODE END WHILE */
         HAL_Delay(999);
-/*      HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_SET);
-        HAL_SPI_Receive_DMA(&hspi1, SPI_RXbuf, sizeof(SPI_RXbuf)); */
-       // HAL_UART_Transmit_DMA(&huart1,Uart_RXbuf,16);
+        HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_SET);
+        HAL_SPI_Receive_DMA(&hspi1, SPI_RXbuf, sizeof(SPI_RXbuf)); 
+    
 
         
         /* USER CODE BEGIN 3 */
@@ -262,28 +262,25 @@ void move_Front(uint8_t arr[16])
 	}
 	Uart_TXbuf[15]=a;
   HAL_UART_Transmit_DMA(&huart1,Uart_TXbuf,sizeof(Uart_TXbuf));
-  HAL_UART_Receive_DMA(&huart1,Uart_RXbuf,16);//uart中断复位
+  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_RESET);
+  HAL_SPI_Receive_DMA(&hspi1,Uart_RXbuf,16);//uart中断复位
 
     
 }
 
 //SPI demo
-/* void HAL_SPI_RxCpltCallback(DMA_HandleTypeDef *hspi)
+ void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     UNUSED(hspi1);
     move_Front(SPI_RXbuf);
-    if(HAL_UART_Transmit_DMA(&huart1,Uart_RXbuf,sizeof(Uart_RXbuf))==HAL_OK)
-    {
-    HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_RESET);
-    HAL_SPI_Receive_DMA(&hspi1, SPI_RXbuf, sizeof(SPI_RXbuf));//SPI中断复位
-    }
-} */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+
+} 
+/* void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     UNUSED(huart1);
     move_Front(Uart_RXbuf);
 
-}
+} */
    //CDC Demo
   /*   if(CDC_Transmit_HS(CDC_TXbuf, sizeof(CDC_TXbuf))==0)
     {
