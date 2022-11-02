@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_device.h"
+#include "usbd_cdc_if.h"
 
 
 /* Private includes ----------------------------------------------------------*/
@@ -109,11 +110,10 @@ int main(void)
     MX_USB_DEVICE_Init();
     /* USER CODE BEGIN 2 */
 
-    HAL_UART_Receive_DMA(&huart1,Uart_RXbuf,16);
-    HAL_UART_Transmit_DMA(&huart1,Uart_TXbuf,16);
+
     HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_RESET);
     HAL_SPI_Receive_DMA(&hspi1, SPI_TXbuf, sizeof(SPI_RXbuf));
-    //CDC_Transmit_HS(CDC_TXbuf, sizeof(CDC_TXbuf));
+    CDC_Transmit_HS(CDC_TXbuf, sizeof(CDC_TXbuf));
     /* USER CODE END 2 */
 
     /* Infinite loop */
@@ -126,6 +126,7 @@ int main(void)
         HAL_Delay(999);
         HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_SET);
         HAL_SPI_Receive_DMA(&hspi1, SPI_RXbuf, sizeof(SPI_RXbuf)); 
+        CDC_Transmit_HS(CDC_TXbuf, sizeof(CDC_TXbuf));
     
 
         
@@ -261,7 +262,7 @@ void move_Front(uint8_t arr[16])
 		Uart_TXbuf[j] = Uart_TXbuf[j + 1];
 	}
 	Uart_TXbuf[15]=a;
-  HAL_UART_Transmit_DMA(&huart1,Uart_TXbuf,sizeof(Uart_TXbuf));
+  CDC_Transmit_HS(CDC_TXbuf, sizeof(CDC_TXbuf));
   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_RESET);
   HAL_SPI_Receive_DMA(&hspi1,Uart_RXbuf,16);//uart中断复位
 
@@ -275,19 +276,7 @@ void move_Front(uint8_t arr[16])
     move_Front(SPI_RXbuf);
 
 } 
-/* void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-    UNUSED(huart1);
-    move_Front(Uart_RXbuf);
 
-} */
-   //CDC Demo
-  /*   if(CDC_Transmit_HS(CDC_TXbuf, sizeof(CDC_TXbuf))==0)
-    {
-    HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_RESET);
-    HAL_SPI_Receive_IT(&hspi1, SPI_TXbuf, sizeof(SPI_TXbuf));//SPI中断复位
-    } */
-    
 
 
 /**
