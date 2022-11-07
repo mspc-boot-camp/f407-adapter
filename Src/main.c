@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_device.h"
-#include "usbd_cdc_if.h"
 
 
 /* Private includes ----------------------------------------------------------*/
@@ -124,9 +123,9 @@ int main(void)
     
         /* USER CODE END WHILE */
         HAL_Delay(999);
-        HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_SET);
-        HAL_SPI_Receive_DMA(&hspi1, SPI_RXbuf, sizeof(SPI_RXbuf)); 
         CDC_Transmit_HS(CDC_TXbuf, sizeof(CDC_TXbuf));
+       // HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_SET);
+       // HAL_SPI_Receive_DMA(&hspi1, SPI_RXbuf, sizeof(SPI_RXbuf)); 
     
 
         
@@ -276,7 +275,19 @@ void move_Front(uint8_t arr[16])
     move_Front(SPI_RXbuf);
 
 } 
+/* void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    UNUSED(huart1);
+    move_Front(Uart_RXbuf);
 
+} */
+   //CDC Demo
+  /*   if(CDC_Transmit_HS(CDC_TXbuf, sizeof(CDC_TXbuf))==0)
+    {
+    HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_RESET);
+    HAL_SPI_Receive_IT(&hspi1, SPI_TXbuf, sizeof(SPI_TXbuf));//SPI中断复位
+    } */
+    
 
 
 /**
