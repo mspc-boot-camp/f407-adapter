@@ -23,7 +23,7 @@
 #include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
-#include "usbd_cdc_if.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -58,8 +58,7 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-uint8_t Uart_TXbuf[16];
-uint8_t Uart_RXbuf[16];
+
 uint8_t SPI_TXbuf[16]="SPI";
 uint8_t SPI_RXbuf[16];
 uint8_t CDC_TXbuf[16]="CDC";
@@ -96,14 +95,12 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_SPI1_Init();
-  MX_USART1_UART_Init();
   MX_USB_DEVICE_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
-
     HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_RESET);
     HAL_SPI_Receive_DMA(&hspi1, SPI_TXbuf, sizeof(SPI_RXbuf));
-    CDC_Transmit_HS(CDC_TXbuf, sizeof(CDC_TXbuf));
+    CDC_Transmit_FS(CDC_TXbuf, sizeof(CDC_TXbuf));
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -116,7 +113,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
         HAL_Delay(999);
-        CDC_Transmit_HS(CDC_TXbuf, sizeof(CDC_TXbuf));
+        CDC_Transmit_FS(CDC_TXbuf, sizeof(CDC_TXbuf));
        // HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_SET);
        // HAL_SPI_Receive_DMA(&hspi1, SPI_RXbuf, sizeof(SPI_RXbuf));
     }
