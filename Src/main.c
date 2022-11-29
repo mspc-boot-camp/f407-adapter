@@ -27,7 +27,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usbd_cdc_if.h"
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -190,7 +193,18 @@ void SystemClock_Config(void)
     
 }   
 
+<<<<<<< Updated upstream
 //timer 2ms
+=======
+/* USER CODE BEGIN 4 */
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    // UNUSED(hspi1);
+    spi_flag = 1;
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+    CDC_Transmit_FS(SPI_RXbuf, sizeof(SPI_RXbuf));
+}
+>>>>>>> Stashed changes
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim == (&htim2))
