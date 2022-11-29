@@ -14,7 +14,7 @@
             "servertype": "openocd",
             "device": "STM32F407VE",
             "configFiles":[
-                "interface/jlink-swd.cfg",
+                "interface/stlink.cfg",
                 // "interface/stlink.cfg",
                 "target/stm32f4x.cfg"
             ],

@@ -21,13 +21,13 @@
 #include "dma.h"
 #include "spi.h"
 #include "tim.h"
-#include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usbd_cdc_if.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,12 +58,16 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t SPI_TXbuf[16]="SPI";
-uint8_t SPI_RXbuf[16];
-uint8_t CDC_TXbuf[16]="CDC";
-uint8_t CDC_RXbuf[16];
+uint8_t SPI_TXbuf[59]={0xEB,0x90,0xC0,0x0B,0x0A,0x0C,0x0A,0xAB,0xBD,0xBC,
+                       0xDC,0xAC,0xDF,0x0A,0x0A,0xCD,0x0A,0xA0,0xCA,0x0D,
+                       0xDC,0xAC,0xDF,0x0A,0x0A,0xCD,0x0A,0x0A,0xCA,0x0C,
+                       0xAC,0xAC,0xDF,0x0A,0x0A,0xCD,0x0A,0xA0,0xCA,0xB0,
+                       0xDB,0xAC,0xDF,0x0B,0x0A,0xCD,0x0A,0x0A,0xCA,0xC0,
+                       0x0C,0xAC,0xDF,0x0A,0x0B,0xCD,0x0A,0x0D,0x0A};
+uint8_t SPI_RXbuf[59];
 
-
+int tim_flag=0;
+int spi_flag=0;
 /* USER CODE END 0 */
 
 /**
@@ -82,7 +86,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -97,14 +100,11 @@ int main(void)
   MX_DMA_Init();
   MX_SPI1_Init();
   MX_USB_DEVICE_Init();
-  MX_USART2_UART_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-    HAL_UART_Transmit(&huart2,CDC_TXbuf, sizeof(CDC_TXbuf),10);
-    //HAL_UART_Transmit_DMA(&huart2,CDC_TXbuf, sizeof(CDC_TXbuf));
-    HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_RESET);
-    HAL_SPI_Receive_DMA(&hspi1, SPI_TXbuf, sizeof(SPI_RXbuf));
-    CDC_Transmit_FS(CDC_TXbuf, sizeof(CDC_TXbuf));
+
+    HAL_SPI_TransmitReceive_DMA(&hspi1,SPI_TXbuf, SPI_RXbuf,58);  
+    CDC_Transmit_FS(SPI_RXbuf, sizeof(SPI_RXbuf));
     HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
@@ -117,9 +117,18 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    
-    
-    
+     if(tim_flag==1)
+  {
+      tim_flag=0;
+      HAL_SPI_TransmitReceive_DMA(&hspi1,SPI_TXbuf, SPI_RXbuf,58); 
+      
+  }
+    if(spi_flag==1)
+  {
+      spi_flag=0;
+      CDC_Transmit_FS(SPI_RXbuf, sizeof(SPI_RXbuf));  
+  }
+     
     }
   /* USER CODE END 3 */
 }
@@ -170,42 +179,24 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void move_Front(uint8_t arr[16])
-{   
-    uint8_t a,i,j;
-   for (i = 0; i < 16; i++)
-	{
-		SPI_RXbuf[i] = arr[i];
-	}
-	
-    a = SPI_RXbuf[0];
-	for (j = 0; j < 15; j++)
-	{
-		SPI_RXbuf[j] = SPI_RXbuf[j + 1];
-	}
-	SPI_RXbuf[15]=a;
-  
-  CDC_Transmit_FS(CDC_TXbuf, sizeof(CDC_TXbuf));
-  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_RESET);
-     
-}
+
 
 //SPI demo
- void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
+   void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     //UNUSED(hspi1);
-    move_Front(SPI_RXbuf);
-    HAL_SPI_Receive_DMA(&hspi1,SPI_RXbuf,16);//spi中断复位 
-} 
-//timer 1ms
+    spi_flag=1;
+   // HAL_SPI_TransmitReceive_DMA(&hspi1,SPI_TXbuf, SPI_RXbuf,58);
+    
+}   
+
+//timer 2ms
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  if (htim == (&htim2)){
-    HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, GPIO_PIN_SET);
-    HAL_SPI_Receive_DMA(&hspi1, SPI_RXbuf, sizeof(SPI_RXbuf));
-  }
-  //HAL_UART_Transmit_DMA(&huart2,CDC_TXbuf, sizeof(CDC_TXbuf));
-  //CDC_Transmit_FS(CDC_TXbuf, sizeof(CDC_TXbuf));
+  if (htim == (&htim2))
+  
+     tim_flag=1;
+     
 }
 /* USER CODE END 4 */
 
