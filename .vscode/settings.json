@@ -7,7 +7,8 @@
         "usart.h": "c",
         "main.h": "c",
         "stm32f4xx_hal_dma.h": "c",
-        "spi.h": "c"
+        "spi.h": "c",
+        "stddef.h": "c"
     }
 
 }
